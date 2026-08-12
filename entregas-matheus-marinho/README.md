@@ -1,5 +1,8 @@
 # Entregas — LIA 2º semestre de 2026
 
+Aluno: Matheus Sousa Marinho
+Matrícula: 202206132
+
 Repositório principal das entregas da disciplina.
 
 ## Licença
