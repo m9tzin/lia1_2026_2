@@ -1,0 +1,11 @@
+id_lead,empresa,segmento,Contato,Fone,cidade,uf,qtd_funcionarios,faturamento_estimado,erp_atual,interesse,origem_lead
+1,AgroCampo,Varejo,Carlos Mendes,(62) 99124-3801,Anápolis,GO,215,médio,Planilhas,alto,outbound
+2,MecSul,Distribuição,Rafael Oliveira,(62) 99317-4420,Goiânia,GO,36,baixo,Sem ERP,baixo,evento
+3,MetalCenter,Varejo,Juliano Ferreira,(34) 99256-7813,Uberlândia,MG,100,alto,ERP simples,alto,inbound
+4,LogExpress,Construção,André Souza,(34) 99183-2297,Uberlândia,MG,170,médio,Sem ERP,alto,site
+5,AgroSul,Indústria,Marcos Pereira,(63) 99271-5542,Palmas,TO,241,baixo,ERP simples,baixo,inbound
+6,Distribuidora Central,Distribuição,Eduardo Martins,(64) 99142-6678,Rio Verde,GO,42,médio,ERP antigo,alto,site
+7,Distribuidora CentroOeste,Agro,Felipe Carvalho,(61) 99388-1204,Brasília,DF,210,médio,ERP simples,médio,outbound
+8,LogMaster,Construção,Bruno Ribeiro,(62) 99205-7731,Goiânia,GO,42,baixo,ERP simples,baixo,evento
+9,Comercial Brasil Norte,Construção,Thiago Alves,(64) 99167-8895,Rio Verde,GO,195,alto,ERP simples,baixo,indicação
+10,AgroForte,Indústria,Pedro Assunção,(63) 98745-9087,Palmas,TO,49,médio,ERP consolidado,baixo,inbound
