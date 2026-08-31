@@ -1,0 +1,13 @@
+id_atleta,atleta,clube,posicao,volume_ofensivo,regularidade,dependencia_de_penalti,risco_disciplinar,dificuldade_negociacao
+1,Alerrandro Barra Mansa Realino de Souza,Vitoria,Atacante,muito alto,regular,alta,baixo,media
+2,Estêvão,Palmeiras,Meio-campo,muito alto,constante,baixa,baixo,alta
+3,Hulk,Atletico-MG,Atacante,bom,regular,alta,medio,media
+4,José Manuel Alberto López,Palmeiras,Atacante,bom,constante,nula,medio,alta
+5,Lucas Moura,Sao Paulo,Meio-campo,bom,constante,baixa,baixo,alta
+6,Luciano da Rocha Neves,Sao Paulo,Meio-campo,alto,constante,baixa,alto,alta
+7,Pablo Vegetti,Vasco,Atacante,alto,constante,nula,medio,media
+8,Pedro,Flamengo,Atacante,alto,regular,alta,baixo,alta
+9,Raphael Veiga,Palmeiras,Meio-campo,alto,regular,alta,medio,alta
+10,Rodrigo Garro,Corinthians,Meio-campo,bom,regular,baixa,medio,media
+11,Wesley Ribeiro Silva,Internacional,Meio-campo,alto,constante,nula,alto,alta
+12,Yuri Alberto,Corinthians,Atacante,muito alto,constante,baixa,alto,media

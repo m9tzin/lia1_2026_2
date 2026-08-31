@@ -1,0 +1,14 @@
+# Segredos
+.env
+.env.*
+!.env.example
+
+# Ambiente uv
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
