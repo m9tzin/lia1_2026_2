@@ -1,0 +1,9 @@
+# Ambiente uv compartilhado por todas as entregas
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/

@@ -95,7 +95,7 @@ sustentam.
 | Arquivo | Conteúdo |
 |---|---|
 | `exercicios_numpy_pandas.ipynb` | Notebook completo, já executado (46 células, 3 gráficos) |
-| `requirements.txt` | Versões usadas, alinhadas com o Google Colab |
+| `pyproject.toml` | Versões usadas, alinhadas com o Google Colab |
 
 ## Como executar
 
@@ -104,16 +104,16 @@ código, então não há arquivo para enviar.
 
 **Local, com [uv](https://docs.astral.sh/uv/):**
 
-```bash
-uv venv --python 3.12
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
+Esta entrega faz parte do workspace `uv` da pasta `Entregas - Matheus Marinho`,
+que mantém um único `.venv` compartilhado por todas as entregas:
 
-uv pip install -r requirements.txt jupyter
-jupyter notebook exercicios_numpy_pandas.ipynb
+```bash
+cd ..            # raiz do workspace
+uv sync --all-packages
+cd exercicios-01-numpy-e-pandas
 ```
 
-Sem ativar o ambiente, o mesmo resultado sai com `uv run`, que executa dentro do
-`.venv` da pasta:
+Feito isso, `uv run` executa dentro do `.venv` do workspace, sem precisar ativar nada:
 
 ```bash
 uv run jupyter notebook exercicios_numpy_pandas.ipynb
@@ -135,7 +135,7 @@ Se o `uv` não estiver instalado: `curl -LsSf https://astral.sh/uv/install.sh | 
   `Timestamp.today()`, que faria os números mudarem a cada execução.
 
 Executado de ponta a ponta sem erros nem avisos em **pandas 2.2.3** (versões deste
-`requirements.txt`, que são as do Colab) e também em **pandas 3.0.5** com numpy 2.5.2.
+`pyproject.toml`, que são as do Colab) e também em **pandas 3.0.5** com numpy 2.5.2.
 
 ## Limitações declaradas
 

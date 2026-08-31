@@ -3,3 +3,6 @@
 
 # macOS
 .DS_Store
+
+# Ambientes virtuais Python
+.venv/

@@ -71,14 +71,20 @@ Chave do Gemini em https://aistudio.google.com/apikey.
 
 ```bash
 cp .env.example .env       # e preencha GEMINI_API_KEY
-uv sync
+
+cd ..                      # raiz do workspace uv
+uv sync --all-packages
+cd exercicios-02-ai-driven-business
+
 uv run python preparar_dados.py                              # gera atletas.csv
 uv run jupyter notebook agente_scouting_brasileirao.ipynb    # gera ranking_scouting_2024.csv
 ```
 
-O notebook precisa do kernel deste `.venv` (Python 3.12). Se o editor oferecer outro
-ambiente, o `import pandas` falha, e a correção é trocar o kernel, não instalar pacotes
-de dentro do notebook.
+Esta entrega faz parte do workspace `uv` da pasta `Entregas - Matheus Marinho`, que
+mantém um único `.venv` compartilhado por todas as entregas. O notebook precisa do
+kernel desse `.venv` (Python 3.12), em `Entregas - Matheus Marinho/.venv/bin/python`.
+Se o editor oferecer outro ambiente, o `import pandas` falha, e a correção é trocar o
+kernel, não instalar pacotes de dentro do notebook.
 
 Para regravar as saídas do notebook sem abrir a interface:
 

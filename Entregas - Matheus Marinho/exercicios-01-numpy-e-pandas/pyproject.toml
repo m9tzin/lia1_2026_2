@@ -1,0 +1,16 @@
+[project]
+name = "exercicios-01-numpy-e-pandas"
+version = "1.0.0"
+description = "Exercicios de NumPy e Pandas"
+requires-python = ">=3.12"
+# Versoes alinhadas com o Google Colab, para que o notebook produza
+# aqui as mesmas saidas que produz la.
+dependencies = [
+    "numpy==2.2.6",
+    "pandas==2.2.3",
+    "matplotlib==3.10.0",
+    "seaborn==0.13.2",
+]
+
+[tool.uv]
+package = false
