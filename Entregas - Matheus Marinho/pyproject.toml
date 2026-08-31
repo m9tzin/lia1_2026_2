@@ -1,0 +1,12 @@
+# Raiz virtual do workspace uv das entregas de LIA.
+# Nao e um projeto instalavel: existe para que todas as entregas
+# compartilhem um unico .venv e um unico uv.lock.
+#
+# Cada entrega declara as proprias dependencias no seu pyproject.toml.
+# Uso: `uv sync` aqui, e `uv run ...` de dentro de qualquer entrega.
+
+[tool.uv.workspace]
+members = ["desafio-*", "exercicios-*"]
+
+[dependency-groups]
+dev = ["jupyter>=1.1.1"]
