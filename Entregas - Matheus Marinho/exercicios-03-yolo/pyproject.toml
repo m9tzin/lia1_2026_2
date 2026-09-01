@@ -1,0 +1,13 @@
+[project]
+name = "deteccao-objetos-yolo"
+version = "1.0.0"
+description = "Introducao pratica a deteccao de objetos com Ultralytics YOLO26"
+requires-python = ">=3.12"
+dependencies = [
+    "ipython>=9.0.0",
+    "pandas>=2.2.3",
+    "ultralytics>=8.4.0,<9",
+]
+
+[tool.uv]
+package = false
