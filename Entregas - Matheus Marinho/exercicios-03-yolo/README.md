@@ -37,9 +37,17 @@ cd exercicios-03-yolo
 uv run jupyter notebook deteccao_objetos_yolo.ipynb
 ```
 
-Salve a entrada como `dados/sessao_estudo.mp4`. Na primeira utilização, as bibliotecas
-baixam automaticamente os pesos YOLO e o modelo Face Landmarker. O vídeo anotado fica
-em `saidas_mvp/sessao_foco_anotada.mp4`.
+Na célula de configurações, ajuste `INPUT_VIDEO_PATH` para o caminho do arquivo local,
+por exemplo:
+
+```python
+INPUT_VIDEO_PATH = Path("video.mp4")
+```
+
+No Colab, mantenha `INPUT_VIDEO_PATH = Path("/content/video.mp4")`. Na primeira
+utilização, as bibliotecas baixam automaticamente os pesos YOLO e o modelo Face
+Landmarker. O vídeo anotado fica em `saidas_mvp/sessao_foco_anotada_opencv.mp4` quando
+`CONVERT_OUTPUT_TO_H264 = False`.
 
 Em GPU, o Ultralytics escolhe o dispositivo automaticamente. Em CPU, aumente
 `PROCESS_EVERY_N_FRAMES` para reduzir o tempo de processamento sem alterar o relógio
