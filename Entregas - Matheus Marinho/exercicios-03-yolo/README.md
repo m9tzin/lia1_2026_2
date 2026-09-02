@@ -1,4 +1,4 @@
-# MVP de monitoramento visual de foco
+# MVP de Monitoramento Visual de Foco
 
 **Aluno:** Matheus Sousa Marinho · **Matrícula:** 202206132 · **Disciplina:** LIA 1 (2026/2)
 
