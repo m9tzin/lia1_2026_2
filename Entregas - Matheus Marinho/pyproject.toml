@@ -6,7 +6,11 @@
 # Uso: `uv sync` aqui, e `uv run ...` de dentro de qualquer entrega.
 
 [tool.uv.workspace]
-members = ["desafio-*", "exercicios-*"]
+members = [
+    "exercicios-praticos/*",
+    "entrega-01-yolo/exercicios-03-yolo",
+    "entrega-02-tensorflow",
+]
 
 [dependency-groups]
 dev = ["jupyter>=1.1.1"]
