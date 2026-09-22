@@ -1,4 +1,5 @@
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text"
+import { CircledText } from "@/components/ui/circled-text"
 import { GridPattern } from "@/components/ui/grid-pattern"
 import { TypingAnimation } from "@/components/ui/typing-animation"
 
@@ -23,7 +24,7 @@ export function Hero() {
         </div>
 
         <h1 className="mt-6 max-w-3xl text-4xl leading-[1.05] font-medium tracking-[-0.03em] sm:text-6xl">
-          leitor universal de modelos .onnx
+          leitor universal de modelos <CircledText>.onnx</CircledText>
         </h1>
 
         <p className="mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">

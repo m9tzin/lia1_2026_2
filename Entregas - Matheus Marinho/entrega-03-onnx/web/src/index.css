@@ -20,6 +20,7 @@
     --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
     --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
     --color-neon: var(--neon);
+    --color-marca: var(--marca);
     --color-ok: var(--ok);
     --color-alerta: var(--alerta);
     --color-verificar: var(--verificar);
@@ -124,6 +125,8 @@
     --radius: 0rem;
 
     --neon: #f7fe62;
+    /* Neon some no branco: no claro a marcação usa um amarelo escurecido (contraste ~3:1). */
+    --marca: #a39500;
     --ok: #3f8f00;
     --alerta: #d92d20;
     --verificar: #b26b00;
@@ -152,6 +155,7 @@
     --ok: #86d93f;
     --alerta: #ff6b5e;
     --verificar: #f0b43c;
+    --marca: #f7fe62;
     --grade: rgba(255, 255, 255, 0.06);
   }
 }
@@ -177,6 +181,7 @@
     --ok: #86d93f;
     --alerta: #ff6b5e;
     --verificar: #f0b43c;
+    --marca: #f7fe62;
     --grade: rgba(255, 255, 255, 0.06);
 }
 
