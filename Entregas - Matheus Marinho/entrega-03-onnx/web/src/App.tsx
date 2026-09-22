@@ -22,6 +22,7 @@ import type { InfoModelo, Passaporte } from "@/lib/tipos"
 import { cn } from "@/lib/utils"
 
 type Aviso = { texto: string; tipo: "erro" | "info" } | null
+type Credito = { texto: string; url: string }
 
 // O exemplo aberto junto com a página. public/exemplo/exemplo.json aponta o modelo e a foto, então
 // trocar o exemplo é trocar arquivos, sem mexer no código.
@@ -76,6 +77,7 @@ export default function App() {
   const [confianca, setConfianca] = useState(0.25)
   const [iou, setIou] = useState(0.45)
   const [aviso, setAviso] = useState<Aviso>(null)
+  const [credito, setCredito] = useState<Credito | null>(null)
   // O que o usuário soltou vence o exemplo, mesmo que o exemplo termine de baixar depois.
   const doUsuario = useRef({ modelo: false, imagem: false })
 
@@ -144,12 +146,15 @@ export default function App() {
     ;(async () => {
       const r = await fetch(EXEMPLO + "exemplo.json")
       if (!r.ok) return
-      const { modelo, imagem } = (await r.json()) as { modelo: string; imagem: string }
+      const { modelo, imagem, credito } = (await r.json()) as { modelo: string; imagem: string; credito?: Credito }
       if (vivo && !doUsuario.current.modelo) setAviso({ texto: "Carregando o modelo de exemplo…", tipo: "info" })
       const [m, i] = await Promise.all([buscarArquivo(modelo), buscarArquivo(imagem)])
       if (!vivo) return
       if (!doUsuario.current.modelo) await carregarModelo(m)
-      if (!doUsuario.current.imagem) await carregarImagem(i)
+      if (!doUsuario.current.imagem) {
+        await carregarImagem(i)
+        setCredito(credito ?? null)
+      }
     })().catch((e) => vivo && setAviso({ texto: `O exemplo não carregou: ${(e as Error).message}`, tipo: "info" }))
     return () => {
       vivo = false
@@ -228,6 +233,7 @@ export default function App() {
             detalhe={imagem && `${imagem.naturalWidth}×${imagem.naturalHeight} px`}
             aoReceber={(f) => {
               doUsuario.current.imagem = true
+              setCredito(null)
               carregarImagem(f)
             }}
           />
@@ -285,6 +291,13 @@ export default function App() {
               confianca={confianca}
               iou={iou}
             />
+            {credito && (
+              <p className="border-t px-5 py-3 font-mono text-[11px] text-muted-foreground">
+                <a href={credito.url} target="_blank" rel="noreferrer" className="underline underline-offset-4 hover:text-foreground">
+                  {credito.texto}
+                </a>
+              </p>
+            )}
           </section>
         </main>
 

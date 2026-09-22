@@ -6,31 +6,31 @@
 
 ## 🧭 Em uma frase
 
-Um modelo YOLO11n é treinado num dataset do **Roboflow** para detectar trabalhador **sem capacete**,
+Um modelo YOLO11n é treinado num dataset do **Roboflow** para detectar **buracos na via**,
 exportado para `.onnx` com um **passaporte** gravado dentro do arquivo, e aberto em
 **[yolonnx.vercel.app](https://yolonnx.vercel.app)**, um leitor que roda qualquer `.onnx` carimbado.
 
 ```
-Roboflow: dataset Hard Hat Workers (fotos de obra com cabeça e capacete anotados)
-   ↓  treino no Colab                    treino/treino_hardhat_colab.ipynb
+Roboflow: dataset de buracos no asfalto (fotos de rua com os buracos anotados)
+   ↓  treino no Colab                    treino/treino_buracos_colab.ipynb
 best.pt: pesos da melhor época do YOLO11n
    ↓  exportação + carimbo               passaporte/de_ultralytics.py
-capacete_best.onnx: modelo + passaporte no mesmo arquivo
-   ↓  abrir no leitor                    yolonnx.vercel.app
+buraco_best.onnx: modelo + passaporte no mesmo arquivo
+   ↓  abrir no leitor                    yolonnx.vercel.app (já vem pré-carregado)
 decisão: ALERTA, VERIFICAR ou OK
 ```
 
-O site é genérico: lê qualquer `.onnx` que tenha passaporte. O modelo de capacete é a aplicação que
-este projeto entrega.
+O site é genérico: lê qualquer `.onnx` que tenha passaporte. O modelo de buracos é a aplicação que
+este projeto entrega e o exemplo que o site abre por padrão.
 
 ## 1. 🎯 O problema
 
-Numa foto de obra, existe trabalhador **sem capacete**? O sistema responde com um estado, não com
-uma lista de caixas:
+Numa foto de rua, existe **buraco** no asfalto que precise de manutenção? O sistema responde com um
+estado, não com uma lista de caixas:
 
 | estado | quando | o que acontece |
 | --- | --- | --- |
-| **ALERTA** | alguma cabeça sem capacete com confiança ≥ `limiar_alerta` | aviso com a quantidade e a maior confiança |
+| **ALERTA** | algum buraco com confiança ≥ `limiar_alerta` | aviso com a quantidade e a maior confiança |
 | **VERIFICAR** | a melhor candidata cai dentro de `zona_incerta` | um humano confere |
 | **OK** | nada relevante acima da zona incerta | nenhum aviso |
 
@@ -39,15 +39,18 @@ modelo de novo.
 
 ## 2. 🗂️ Dataset (desafio Roboflow)
 
-[Hard Hat Workers](https://universe.roboflow.com/joseph-nelson/hard-hat-workers), no Roboflow
-Universe: cerca de 7 mil imagens de canteiros de obra anotadas com `head`, `helmet` e `person`. O
-treino usa a versão `raw_HeadHelmetClasses` (só cabeça e capacete), porque `person` não entra na
-decisão. As classes são traduzidas por nome: `head → sem capacete`, `helmet → capacete`.
+[pothole-detection-yolo-v8](https://universe.roboflow.com/kartik-zvust/pothole-detection-yolo-v8),
+versão 1, no Roboflow Universe: fotos de rua com os buracos anotados. A classe é traduzida por nome,
+`pothole → buraco`.
+
+O dataset não está fixo no código. O primeiro bloco do notebook reúne workspace, projeto, versão,
+tradução das classes e regra de decisão; o resto do notebook não cita nome de classe. Antes de treinar,
+o notebook confere se a regra de alerta cita uma classe que existe no dataset.
 
 ## 3. 🏋️ Treino e o best.pt
 
-O notebook `treino/treino_hardhat_colab.ipynb` baixa o dataset pela API do Roboflow e treina um
-YOLO11n (`epochs=30`, `imgsz=640`, `patience=10`).
+O notebook `treino/treino_buracos_colab.ipynb` baixa o dataset pela API do Roboflow e treina um
+YOLO11n (`epochs=50`, `imgsz=640`, `patience=15`).
 
 Durante o treino, o Ultralytics valida o modelo ao fim de cada época e calcula um *fitness*. Em
 `runs/detect/<nome>/weights/` ficam:
@@ -73,14 +76,14 @@ transporte dos nomes das classes". Aqui, `passaporte/de_ultralytics.py` exporta 
 - qual decisão tomar (limiar de alerta, zona incerta, mensagem);
 - de onde o modelo veio, incluindo a época e as métricas do `best.pt`.
 
-Exemplo do passaporte do modelo de capacete (os números de `best` saem do treino real):
+Passaporte do `buraco_best.onnx` publicado (os números de `best` saem do treino real):
 
 ```json
 {
   "versao": 1,
-  "nome": "Capacete em obra (YOLO11n)",
+  "nome": "Buraco na via (YOLO11n)",
   "tarefa": "deteccao",
-  "classes": ["sem capacete", "capacete"],
+  "classes": ["buraco"],
   "entrada": {
     "tensor": "images", "layout": "NCHW", "tamanho": [640, 640], "cores": "RGB",
     "redimensionar": "letterbox", "preenchimento": 114,
@@ -89,13 +92,14 @@ Exemplo do passaporte do modelo de capacete (os números de `best` saem do trein
   "saida": { "tensor": "output0", "formato": "caixas_xywh_por_classe" },
   "operacao": { "confianca_minima": 0.35, "iou_nms": 0.45 },
   "decisao": {
-    "alertar_se": ["sem capacete"], "limiar_alerta": 0.5,
-    "zona_incerta": [0.3, 0.5], "mensagem": "Trabalhador sem capacete"
+    "alertar_se": ["buraco"], "limiar_alerta": 0.5,
+    "zona_incerta": [0.3, 0.5], "mensagem": "Buraco na via"
   },
   "origem": {
-    "framework": "ultralytics 8.4.x", "pesos": "best.pt",
-    "dataset": "roboflow joseph-nelson/hard-hat-workers",
-    "best": { "epoca": 0, "mAP50": 0.0, "mAP50_95": 0.0, "precisao": 0.0, "recall": 0.0 }
+    "framework": "ultralytics 8.4.159", "pesos": "best.pt",
+    "dataset": "roboflow kartik-zvust/pothole-detection-yolo-v8 v1",
+    "best": { "epoca": 36, "epocas_treinadas": 50, "mAP50": 0.6076, "mAP50_95": 0.2379,
+              "precisao": 0.6498, "recall": 0.5839 }
   }
 }
 ```
@@ -116,20 +120,32 @@ Formatos de saída suportados, o que permite carimbar modelos que não vêm do U
 
 ## 5. 🌐 Uso
 
-Acesse **[yolonnx.vercel.app](https://yolonnx.vercel.app)**, carregue o `capacete_best.onnx` e uma
-foto. O leitor lê o passaporte, roda o modelo no próprio navegador e mostra o estado. Um `.onnx` sem
+Acesse **[yolonnx.vercel.app](https://yolonnx.vercel.app)**. A página já abre com um modelo e uma foto
+de exemplo carregados e mostra o estado. Solte outro `.onnx` ou outra foto para substituir; o que você
+solta tem prioridade, mesmo que o exemplo ainda esteja baixando. O leitor lê o passaporte e roda o
+modelo no próprio navegador.
+
+O exemplo fica em `web/public/exemplo/`: `exemplo.json` aponta o modelo e a foto, então trocar o
+exemplo é trocar arquivos, sem mexer no código. O exemplo publicado é o `buraco_best.onnx` com uma
+foto de rua que o modelo nunca viu no treino:
+[Newport Whitepit Lane pot holes 2](https://commons.wikimedia.org/wiki/File:Newport_Whitepit_Lane_pot_holes_2.JPG),
+de Editor5807, licença [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), via Wikimedia
+Commons. O crédito vem do campo `credito` do `exemplo.json` e aparece abaixo do resultado. Um `.onnx` sem
 passaporte não é adivinhado: o leitor propõe um rascunho a partir do grafo e devolve o arquivo
 carimbado depois de validado.
 
 ## ▶️ Como reproduzir
 
-### ☁️ Treino no Colab (Roboflow → `capacete_best.onnx`)
+### ☁️ Treino no Colab (Roboflow → `buraco_best.onnx`)
 
-1. Abra `treino/treino_hardhat_colab.ipynb` no Colab com **GPU T4**.
+1. Abra `treino/treino_buracos_colab.ipynb` no Colab com **GPU T4**.
 2. Em 🔑 *Secrets*, cadastre `ROBOFLOW_API_KEY` e permita o acesso do notebook. A chave não aparece no
    código.
-3. **Ambiente de execução → Executar tudo**. No fim, `capacete_best.onnx` é baixado.
-4. Guarde o arquivo em `modelos/` e abra em [yolonnx.vercel.app](https://yolonnx.vercel.app).
+3. **Ambiente de execução → Executar tudo**. No fim, o notebook baixa `buraco_best.onnx` e
+   `exemplo.jpg`, a foto de teste com o buraco detectado com mais confiança.
+4. Guarde o `.onnx` em `modelos/`. Para ele virar o exemplo do site, copie o modelo e uma foto para
+   `web/public/exemplo/`, aponte `exemplo.json` para eles e publique o site de novo. Foto de fora do
+   dataset precisa de licença que permita publicar; se a licença pedir crédito, preencha `credito`.
 
 ### 💻 Localmente (testes e modelo de demonstração)
 
@@ -156,18 +172,23 @@ uv run python -m passaporte.carimbar mostrar modelos/yolo11n_pt.onnx
 
 | arquivo | finalidade |
 | --- | --- |
-| `treino/treino_hardhat_colab.ipynb` | Roboflow → YOLO11n → `best.pt` → `capacete_best.onnx` (Colab, GPU) |
+| `treino/treino_buracos_colab.ipynb` | Roboflow → YOLO11n → `best.pt` → `buraco_best.onnx` + foto de exemplo (Colab, GPU) |
 | `passaporte/de_ultralytics.py` | `best.pt` → `.onnx` com passaporte preenchido automaticamente |
 | `passaporte/carimbar.py` | grava, lê e valida o passaporte contra o esquema e contra o grafo |
 | `passaporte/esquema_v1.json` | o contrato (JSON Schema) |
 | `passaporte/de_pytorch.py` | CNN PyTorch comum carimbada à mão, prova de que o leitor não depende do Ultralytics |
 | `treino/classes_coco80_pt.txt` | as 80 classes COCO em português da Aula 13, para o modelo de demonstração |
-| `modelos/` | destino do `capacete_best.onnx` |
+| `modelos/` | destino do `buraco_best.onnx` |
 | `web/` | o leitor publicado em [yolonnx.vercel.app](https://yolonnx.vercel.app) |
+| `web/public/exemplo/` | modelo e foto que o site abre por padrão, apontados por `exemplo.json` |
 | `tests/` | 13 testes em Python e 14 em Node |
 
 ## ✅ Verificação feita
 
+- **Modelo de buracos:** 50 épocas no Colab (T4); o `best.pt` é o da época 36, com mAP50 0,61,
+  mAP50-95 0,24, precisão 0,65 e recall 0,58 na validação. Na foto de Newport, que não faz parte do
+  dataset, o `YOLO(...).predict()` do Python e o leitor encontraram os mesmos 3 buracos (82%, 77% e
+  55%, caixas iguais a até 1 px), e a decisão foi **ALERTA**.
 - **Fluxo do best:** treino curto de 3 épocas no `coco8`. O `best.pt` escolhido foi o da época 3
   (mAP50-95 0,4407, maior que 0,4094 das épocas 1 e 2, apesar do mAP50 menor), e o passaporte
   registrou exatamente esses valores do `results.csv`.
@@ -184,8 +205,10 @@ uv run python -m passaporte.carimbar mostrar modelos/yolo11n_pt.onnx
 
 ## ⚠️ Limitações
 
-- O treino no Hard Hat Workers roda no Colab com a chave do Roboflow. As métricas do modelo de
-  capacete só existem depois dessa execução; os números de `best` no exemplo acima são ilustrativos.
+- O recall de 0,58 na validação quer dizer que cerca de 4 em cada 10 buracos anotados passam
+  despercebidos. Para triagem de manutenção serve como apoio; como fonte única, não.
+- O exemplo pré-carregado baixa cerca de 10 MB ao abrir a página, mesmo para quem só quer usar o
+  próprio `.onnx`.
 - A v1 cobre detecção e classificação. Segmentação, pose e OBB ficam como formatos futuros.
 - O passaporte é convenção deste projeto. Outras ferramentas ignoram a chave, sem quebrar nada, mas
   também não a aproveitam.
@@ -197,6 +220,6 @@ uv run python -m passaporte.carimbar mostrar modelos/yolo11n_pt.onnx
 ## 📚 Referências
 
 - Material da Aula 13: `materiais/6-onnx-Aula 13/`.
-- [Roboflow Universe, Hard Hat Workers](https://universe.roboflow.com/joseph-nelson/hard-hat-workers).
+- [Roboflow Universe, pothole-detection-yolo-v8](https://universe.roboflow.com/kartik-zvust/pothole-detection-yolo-v8).
 - [ONNX, `onnx.proto`](https://github.com/onnx/onnx/blob/main/onnx/onnx.proto): `ModelProto.metadata_props` é o campo 14.
 - [Ultralytics, exportação para ONNX](https://docs.ultralytics.com/integrations/onnx/).

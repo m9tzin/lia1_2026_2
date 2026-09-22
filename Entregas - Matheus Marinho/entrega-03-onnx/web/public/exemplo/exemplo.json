@@ -1,4 +1,8 @@
 {
-  "modelo": "yolo11n_pt.onnx",
-  "imagem": "exemplo.jpg"
+  "modelo": "buraco_best.onnx",
+  "imagem": "buracos_newport.jpg",
+  "credito": {
+    "texto": "Foto: Editor5807, CC BY 3.0, via Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:Newport_Whitepit_Lane_pot_holes_2.JPG"
+  }
 }
