@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { Carimbo } from "@/components/Carimbo"
 import { Ficha } from "@/components/Ficha"
@@ -22,6 +22,16 @@ import type { InfoModelo, Passaporte } from "@/lib/tipos"
 import { cn } from "@/lib/utils"
 
 type Aviso = { texto: string; tipo: "erro" | "info" } | null
+
+// O exemplo aberto junto com a página. public/exemplo/exemplo.json aponta o modelo e a foto, então
+// trocar o exemplo é trocar arquivos, sem mexer no código.
+const EXEMPLO = "/exemplo/"
+
+async function buscarArquivo(nome: string): Promise<File> {
+  const r = await fetch(EXEMPLO + nome)
+  if (!r.ok) throw new Error(`${nome}: HTTP ${r.status}`)
+  return new File([await r.blob()], nome)
+}
 
 function Controle(props: {
   rotulo: string
@@ -66,6 +76,8 @@ export default function App() {
   const [confianca, setConfianca] = useState(0.25)
   const [iou, setIou] = useState(0.45)
   const [aviso, setAviso] = useState<Aviso>(null)
+  // O que o usuário soltou vence o exemplo, mesmo que o exemplo termine de baixar depois.
+  const doUsuario = useRef({ modelo: false, imagem: false })
 
   const ativar = useCallback(async (b: Uint8Array, p: Passaporte) => {
     setPassaporte(p)
@@ -127,6 +139,24 @@ export default function App() {
     setImagem(img)
   }
 
+  useEffect(() => {
+    let vivo = true
+    ;(async () => {
+      const r = await fetch(EXEMPLO + "exemplo.json")
+      if (!r.ok) return
+      const { modelo, imagem } = (await r.json()) as { modelo: string; imagem: string }
+      if (vivo && !doUsuario.current.modelo) setAviso({ texto: "Carregando o modelo de exemplo…", tipo: "info" })
+      const [m, i] = await Promise.all([buscarArquivo(modelo), buscarArquivo(imagem)])
+      if (!vivo) return
+      if (!doUsuario.current.modelo) await carregarModelo(m)
+      if (!doUsuario.current.imagem) await carregarImagem(i)
+    })().catch((e) => vivo && setAviso({ texto: `O exemplo não carregou: ${(e as Error).message}`, tipo: "info" }))
+    return () => {
+      vivo = false
+    }
+    // Só na abertura da página.
+  }, [])
+
   // Roda a inferência sempre que houver sessão e imagem novas. Limiar e IoU só re-decodificam.
   useEffect(() => {
     if (!sessao || !passaporte || !imagem) return
@@ -183,7 +213,10 @@ export default function App() {
               aceita=".onnx"
               arquivo={nomeModelo}
               detalhe={mb && `${mb} · ${info?.produtor || "produtor desconhecido"}`}
-              aoReceber={carregarModelo}
+              aoReceber={(f) => {
+                doUsuario.current.modelo = true
+                carregarModelo(f)
+              }}
             />
           </div>
           <Soltar
@@ -193,7 +226,10 @@ export default function App() {
             aceita="image/*"
             arquivo={nomeImagem}
             detalhe={imagem && `${imagem.naturalWidth}×${imagem.naturalHeight} px`}
-            aoReceber={carregarImagem}
+            aoReceber={(f) => {
+              doUsuario.current.imagem = true
+              carregarImagem(f)
+            }}
           />
         </div>
 
