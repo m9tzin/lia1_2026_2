@@ -13,8 +13,11 @@ outro jeito: cada modelo recebe um **passaporte**, um JSON gravado dentro do pr�
 - qual decisão tomar (limiar de alerta, zona incerta, mensagem);
 - de onde o modelo veio, incluindo a época e as métricas do `best.pt`.
 
-O leitor web não sabe nada de YOLO, Keras ou PyTorch. Ele só executa o que o passaporte manda. Um
-arquivo, sem txt ao lado, e o mesmo leitor serve para qualquer modelo carimbado.
+Quem lê o modelo não precisa saber de YOLO, Keras ou PyTorch: basta seguir o que o passaporte manda.
+Um arquivo, sem txt ao lado, e o mesmo leitor serve para qualquer modelo carimbado.
+
+> **Para usar:** acesse **[yolonnx.vercel.app](https://yolonnx.vercel.app)**, carregue um `.onnx` com
+> passaporte e uma imagem. A inferência roda no próprio navegador.
 
 ## 🎯 O produto
 
@@ -23,15 +26,14 @@ arquivo, sem txt ao lado, e o mesmo leitor serve para qualquer modelo carimbado.
 | estado | quando | o que acontece |
 | --- | --- | --- |
 | **ALERTA** | alguma cabeça sem capacete com confiança ≥ `limiar_alerta` | aviso com a quantidade e a maior confiança |
-| **VERIFICAR** | a melhor candidata cai dentro de `zona_incerta` | caixa tracejada, um humano confere |
+| **VERIFICAR** | a melhor candidata cai dentro de `zona_incerta` | um humano confere |
 | **OK** | nada relevante acima da zona incerta | nenhum aviso |
 | **INCERTO** | (classificação) top 1 abaixo da confiança mínima | mostra o top 3, não decide |
 
 A regra fica no passaporte, não no leitor: trocar o limiar é carimbar de novo, sem mexer em código.
 
-**Fallback de contrato:** um `.onnx` sem passaporte não é adivinhado. O leitor mostra os tensores do
-grafo, abre um rascunho do passaporte já preenchido com o que dá para ler do arquivo, valida o que
-você completar e devolve o `.onnx` carimbado para download.
+**Fallback de contrato:** um `.onnx` sem passaporte não é adivinhado. O leitor propõe um rascunho a
+partir dos tensores do grafo, valida o que for completado e devolve o `.onnx` carimbado.
 
 ## 🗂️ Dataset (desafio Roboflow)
 
@@ -64,10 +66,7 @@ fica em `model.trainer.best` logo após o treino.
 | `passaporte/de_pytorch.py` | CNN PyTorch comum carimbada à mão, prova de que o leitor não depende do Ultralytics |
 | `treino/treino_hardhat_colab.ipynb` | Roboflow → YOLO11n → `best.pt` → `capacete_best.onnx` (Colab, GPU) |
 | `treino/classes_coco80_pt.txt` | as 80 classes COCO em português da Aula 13, para carimbar o `yolo11n.pt` |
-| `web/` | o leitor universal no navegador (Vite + React + TypeScript) |
-| `web/src/lib/passaporte.js` | leitura e gravação do passaporte direto nos bytes do protobuf |
-| `web/src/lib/decodificadores.js` | pré-processamento, NMS e um decodificador por formato de saída |
-| `web/src/lib/motor.ts` | sessão do ONNX Runtime Web (wasm empacotado, funciona offline) e rascunho de passaporte |
+| `web/` | o leitor no navegador, publicado em [yolonnx.vercel.app](https://yolonnx.vercel.app) |
 | `tests/` | 13 testes em Python e 14 em Node |
 | `modelos/` | destino do `capacete_best.onnx` baixado do Colab |
 
@@ -116,19 +115,16 @@ existe no grafo, o tamanho diverge do input estático, o nº de classes não bat
 exemplo 3 classes numa saída com 4 + 2 canais), há classes repetidas ou a regra de alerta cita uma
 classe que não existe.
 
-## ▶️ Como executar
+## ▶️ Como reproduzir
 
-Pré-requisitos: [uv](https://docs.astral.sh/uv/) e Node.js 20 ou mais recente.
-
-### 💻 Localmente
-
-Na raiz do workspace das entregas (`Entregas - Matheus Marinho/`):
+Pré-requisito: [uv](https://docs.astral.sh/uv/). Na raiz do workspace das entregas
+(`Entregas - Matheus Marinho/`):
 
 ```bash
 uv sync --all-packages
 cd entrega-03-onnx
-uv run pytest -q                 # Python: carimbo e validação
-node --test tests/*.test.mjs     # JavaScript: protobuf, decodificadores e decisão
+uv run pytest -q                 # carimbo e validação do passaporte
+node --test tests/*.test.mjs     # leitura do protobuf, decodificadores e decisão (Node.js 20+)
 
 # modelo de demonstração: YOLO11n pré-treinado, classes da Aula 13
 uv run python -m passaporte.de_ultralytics --pesos yolo11n.pt \
@@ -138,26 +134,10 @@ uv run python -m passaporte.de_ultralytics --pesos yolo11n.pt \
 
 # ver o passaporte de qualquer .onnx
 uv run python -m passaporte.carimbar mostrar modelos/yolo11n_pt.onnx
-
-# o leitor
-cd web
-npm install
-npm run dev        # abrir o endereço que o Vite mostrar
-npm run build      # versão estática em web/dist
 ```
 
-Sem `--pesos`, `de_ultralytics.py` usa o `runs/detect/*/weights/best.pt` mais recente.
-
-### 🔎 Usando o leitor
-
-1. Com `npm run dev` rodando, abra o endereço mostrado no terminal.
-2. Em **01 / Modelo**, solte ou escolha um `.onnx` (por exemplo `modelos/yolo11n_pt.onnx` ou
-   `modelos/capacete_best.onnx`). O passaporte aparece à esquerda.
-3. Em **02 / Imagem**, solte ou escolha uma foto. O resultado mostra o estado (ALERTA, VERIFICAR, OK
-   ou INCERTO), as caixas e a lista de detecções.
-4. Ajuste a confiança mínima e o IoU no painel **Operação**, se quiser; o resultado atualiza na hora.
-5. Se o `.onnx` não tiver passaporte, complete o rascunho em JSON e clique em **Carimbar e baixar**:
-   o arquivo carimbado é baixado e carregado no leitor.
+Sem `--pesos`, `de_ultralytics.py` usa o `runs/detect/*/weights/best.pt` mais recente. O `.onnx`
+gerado pode ser aberto direto em [yolonnx.vercel.app](https://yolonnx.vercel.app).
 
 ### ☁️ Google Colab (treino no Roboflow)
 
@@ -165,22 +145,22 @@ Sem `--pesos`, `de_ultralytics.py` usa o `runs/detect/*/weights/best.pt` mais re
 2. Em 🔑 *Secrets*, cadastre `ROBOFLOW_API_KEY` e permita o acesso do notebook. A chave não aparece no
    código.
 3. **Ambiente de execução → Executar tudo**. No fim, `capacete_best.onnx` é baixado.
-4. Copie o arquivo para `modelos/` e abra no leitor.
+4. Copie o arquivo para `modelos/` e abra em [yolonnx.vercel.app](https://yolonnx.vercel.app).
 
 ## ✅ Verificação feita
 
 - **Fluxo do best:** treino curto de 3 épocas no `coco8`. O `best.pt` escolhido foi o da época 3
   (mAP50-95 0,4407, maior que 0,4094 das épocas 1 e 2, apesar do mAP50 menor), e o passaporte
   registrou exatamente esses valores do `results.csv`.
-- **Paridade no navegador:** `bus.jpg` com o YOLO11n carimbado. O leitor web e o
+- **Paridade com o Ultralytics:** `bus.jpg` com o YOLO11n carimbado. O leitor e o
   `YOLO("yolo11n_pt.onnx").predict()` do Python deram as mesmas 5 detecções (ônibus 94%, pessoas
-  90%, 85%, 83%, 40%), com caixas iguais a até 1 px. Selo: **ALERTA**, "Pessoa detectada (3, maior
-  90%)". Inferência de 152 ms no wasm. Repetido na versão React: mesmas detecções, 135 ms.
-- **Fallback:** a CNN sem passaporte abriu o rascunho (entrada `imagem [1, 3, 128, 128]`, saída
-  `logits [1, 2]`); uma regra com classe inexistente foi recusada; depois de corrigido, o modelo foi
-  carimbado e carregado. Com pesos aleatórios o top 1 ficou em 55%, e o leitor respondeu
+  90%, 85%, 83%, 40%), com caixas iguais a até 1 px, e a decisão foi **ALERTA** (3 pessoas acima de
+  50%).
+- **Fallback:** para a CNN sem passaporte, o rascunho saiu do grafo (entrada `imagem [1, 3, 128, 128]`,
+  saída `logits [1, 2]`); uma regra com classe inexistente foi recusada; depois de corrigido, o modelo
+  foi carimbado. Com pesos aleatórios o top 1 ficou em 55%, e o leitor respondeu
   **INCERTO** em vez de chutar "gato".
-- **Compatibilidade:** um `.onnx` carimbado pelo JavaScript passa no `onnx.checker` e é lido pelo
+- **Compatibilidade:** um `.onnx` carimbado pelo leitor passa no `onnx.checker` e é lido pelo
   `carimbar.py`; carimbar de novo substitui a chave em vez de duplicar.
 
 ## ⚠️ Limitações
@@ -188,10 +168,8 @@ Sem `--pesos`, `de_ultralytics.py` usa o `runs/detect/*/weights/best.pt` mais re
 - A v1 cobre detecção e classificação. Segmentação, pose e OBB ficam como formatos futuros.
 - O passaporte é convenção deste projeto. Outras ferramentas ignoram a chave, sem quebrar nada, mas
   também não a aproveitam.
-- O leitor redimensiona com o `canvas` do navegador, e o Ultralytics com o OpenCV. A diferença foi de
-  até 1 px e décimos de ponto percentual na confiança no teste feito, mas pode crescer em imagens
-  muito pequenas.
-- O backend wasm roda em CPU. Para vídeo em tempo real seria preciso WebGPU.
+- O leitor redimensiona a imagem de forma diferente do OpenCV usado pelo Ultralytics. A diferença foi
+  de até 1 px no teste feito, mas pode crescer em imagens muito pequenas.
 - Os limiares do bloco `decisao` no notebook (0,5 e zona 0,3 a 0,5) são um ponto de partida, não
   foram calibrados contra o custo de um falso negativo na obra.
 
@@ -200,5 +178,4 @@ Sem `--pesos`, `de_ultralytics.py` usa o `runs/detect/*/weights/best.pt` mais re
 - Material da Aula 13: `materiais/6-onnx-Aula 13/`.
 - [Roboflow Universe, Hard Hat Workers](https://universe.roboflow.com/joseph-nelson/hard-hat-workers).
 - [ONNX, `onnx.proto`](https://github.com/onnx/onnx/blob/main/onnx/onnx.proto): `ModelProto.metadata_props` é o campo 14.
-- [ONNX Runtime Web](https://onnxruntime.ai/docs/tutorials/web/).
 - [Ultralytics, exportação para ONNX](https://docs.ultralytics.com/integrations/onnx/).
