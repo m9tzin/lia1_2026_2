@@ -23,7 +23,7 @@ export function Hero() {
         </div>
 
         <h1 className="mt-6 max-w-3xl text-4xl leading-[1.05] font-medium tracking-[-0.03em] sm:text-6xl">
-          Leitor universal de modelos ONNX
+          leitor universal de modelos .onnx
         </h1>
 
         <p className="mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
