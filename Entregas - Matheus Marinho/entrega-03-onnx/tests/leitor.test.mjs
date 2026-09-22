@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { carimbar, inspecionar, problemas } from "../web/passaporte.js";
+import { carimbar, inspecionar, problemas } from "../web/src/lib/passaporte.js";
 import {
   decidir,
   decodificar,
@@ -12,7 +12,7 @@ import {
   nms,
   paraTensor,
   softmax,
-} from "../web/decodificadores.js";
+} from "../web/src/lib/decodificadores.js";
 
 const fixture = (nome) => readFileSync(new URL(`./fixtures/${nome}`, import.meta.url));
 

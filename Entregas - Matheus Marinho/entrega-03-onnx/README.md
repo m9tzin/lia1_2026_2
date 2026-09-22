@@ -64,9 +64,10 @@ fica em `model.trainer.best` logo após o treino.
 | `passaporte/de_pytorch.py` | CNN PyTorch comum carimbada à mão, prova de que o leitor não depende do Ultralytics |
 | `treino/treino_hardhat_colab.ipynb` | Roboflow → YOLO11n → `best.pt` → `capacete_best.onnx` (Colab, GPU) |
 | `treino/classes_coco80_pt.txt` | as 80 classes COCO em português da Aula 13, para carimbar o `yolo11n.pt` |
-| `web/index.html`, `web/app.js` | o leitor universal (ONNX Runtime Web, wasm) |
-| `web/passaporte.js` | leitura e gravação do passaporte direto nos bytes do protobuf |
-| `web/decodificadores.js` | pré-processamento, NMS e um decodificador por formato de saída |
+| `web/` | o leitor universal: Vite + React + TypeScript + Tailwind v4, com componentes do Magic UI |
+| `web/src/lib/passaporte.js` | leitura e gravação do passaporte direto nos bytes do protobuf |
+| `web/src/lib/decodificadores.js` | pré-processamento, NMS e um decodificador por formato de saída |
+| `web/src/lib/motor.ts` | sessão do ONNX Runtime Web (wasm empacotado, funciona offline) e rascunho de passaporte |
 | `tests/` | 13 testes em Python e 14 em Node |
 | `modelos/` | destino do `capacete_best.onnx` baixado do Colab |
 
@@ -108,7 +109,7 @@ Formatos de saída suportados:
 | `probabilidades` | `[1, nc]` | classificadores com softmax no grafo |
 | `logits` | `[1, nc]` | classificadores sem softmax (o leitor aplica) |
 
-Novo formato é um novo decodificador em `web/decodificadores.js`; o resto não muda.
+Novo formato é um novo decodificador em `web/src/lib/decodificadores.js`; o resto não muda.
 
 Ao carimbar, `carimbar.py` recusa o passaporte se: o JSON não segue o esquema, o tensor declarado não
 existe no grafo, o tamanho diverge do input estático, o nº de classes não bate com a saída (por
@@ -136,8 +137,11 @@ uv run python -m passaporte.de_ultralytics --pesos yolo11n.pt \
 # ver o passaporte de qualquer .onnx
 uv run python -m passaporte.carimbar mostrar modelos/yolo11n_pt.onnx
 
-# o leitor (módulos ES não carregam via file://)
-cd web && python3 -m http.server 8000     # abrir http://localhost:8000
+# o leitor
+cd web
+npm install
+npm run dev        # abrir o endereço que o Vite mostrar
+npm run build      # versão estática em web/dist
 ```
 
 Sem `--pesos`, `de_ultralytics.py` usa o `runs/detect/*/weights/best.pt` mais recente.
@@ -150,6 +154,29 @@ Sem `--pesos`, `de_ultralytics.py` usa o `runs/detect/*/weights/best.pt` mais re
 3. **Ambiente de execução → Executar tudo**. No fim, `capacete_best.onnx` é baixado.
 4. Copie o arquivo para `modelos/` e abra no leitor.
 
+## 🎨 Interface
+
+Visual inspirado no [Infisical](https://infisical.com/): fundo branco, texto quase preto, bordas de 1 px,
+cantos retos, botões em pílula, amarelo neon (`#f7fe62`) como único destaque e rótulos em mono
+maiúsculo (JetBrains Mono) com tags entre colchetes, como `[carregado]`. Tema escuro automático pelo
+sistema, com botão para alternar.
+
+Componentes do [Magic UI](https://magicui.design/), instalados pelo CLI do shadcn:
+
+| componente | onde |
+| --- | --- |
+| Grid Pattern | fundo do topo, com quadrados neon acesos |
+| Dot Pattern | aparece nas áreas de soltar arquivo ao passar o mouse ou arrastar |
+| Animated Shiny Text | selo `lia.passaporte v1` |
+| Typing Animation | o que o arquivo informa: classes, pré-processamento, regra, métricas |
+| Number Ticker | mAP50, mAP50-95 e época do best; tempo de inferência |
+| Border Beam | moldura da imagem enquanto a inferência roda |
+| Animated List | detecções entrando uma a uma, da maior para a menor confiança |
+| Shimmer Button | "Carimbar e baixar" no fluxo sem passaporte |
+
+Caixas desenhadas em amarelo neon; vermelho fica reservado para o que de fato dispara o alerta
+(classe de alerta acima de `limiar_alerta`), para que o destaque signifique decisão e não só classe.
+
 ## ✅ Verificação feita
 
 - **Fluxo do best:** treino curto de 3 épocas no `coco8`. O `best.pt` escolhido foi o da época 3
@@ -158,7 +185,7 @@ Sem `--pesos`, `de_ultralytics.py` usa o `runs/detect/*/weights/best.pt` mais re
 - **Paridade no navegador:** `bus.jpg` com o YOLO11n carimbado. O leitor web e o
   `YOLO("yolo11n_pt.onnx").predict()` do Python deram as mesmas 5 detecções (ônibus 94%, pessoas
   90%, 85%, 83%, 40%), com caixas iguais a até 1 px. Selo: **ALERTA**, "Pessoa detectada (3, maior
-  90%)". Inferência de 152 ms no wasm.
+  90%)". Inferência de 152 ms no wasm. Repetido na versão React: mesmas detecções, 135 ms.
 - **Fallback:** a CNN sem passaporte abriu o rascunho (entrada `imagem [1, 3, 128, 128]`, saída
   `logits [1, 2]`); uma regra com classe inexistente foi recusada; depois de corrigido, o modelo foi
   carimbado e carregado. Com pesos aleatórios o top 1 ficou em 55%, e o leitor respondeu
