@@ -6,3 +6,6 @@
 
 # Ambientes virtuais Python
 .venv/
+
+# Datasets locais
+datasets/
