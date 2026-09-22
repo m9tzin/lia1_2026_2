@@ -155,8 +155,8 @@ export default function App() {
       <div className="pointer-events-auto mx-auto min-h-screen max-w-[1240px] border-x bg-background">
         <header className="flex items-center justify-between border-b px-6 py-4 sm:px-10">
           <div className="flex items-center gap-2.5">
-            <span className="grid size-6 place-items-center bg-neon font-mono text-[11px] font-bold text-black">P</span>
-            <span className="text-sm font-medium tracking-tight">passaporte/onnx</span>
+            <span className="grid size-6 place-items-center bg-neon font-mono text-[11px] font-bold text-black">Y</span>
+            <span className="text-sm font-medium tracking-tight">you only look onnx</span>
           </div>
           <nav className="flex items-center gap-5">
             <span className="rotulo hidden sm:inline">LIA 1 · 2026/2</span>
