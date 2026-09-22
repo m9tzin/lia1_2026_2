@@ -19,7 +19,7 @@ export function Hero() {
       <div className="relative px-6 pt-20 pb-14 sm:px-10 sm:pt-24 sm:pb-20">
         <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1">
           <span className="size-1.5 rounded-full bg-ok" />
-          <AnimatedShinyText className="tag mx-0 max-w-none">lia.passaporte v1</AnimatedShinyText>
+          <AnimatedShinyText className="tag mx-0 max-w-none">YOLONNX v1</AnimatedShinyText>
         </div>
 
         <h1 className="mt-6 max-w-3xl text-4xl leading-[1.05] font-medium tracking-[-0.03em] sm:text-6xl">
