@@ -1,0 +1,4 @@
+{
+  "modelo": "yolo11n_pt.onnx",
+  "imagem": "exemplo.jpg"
+}
