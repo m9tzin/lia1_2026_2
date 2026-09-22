@@ -64,7 +64,7 @@ fica em `model.trainer.best` logo após o treino.
 | `passaporte/de_pytorch.py` | CNN PyTorch comum carimbada à mão, prova de que o leitor não depende do Ultralytics |
 | `treino/treino_hardhat_colab.ipynb` | Roboflow → YOLO11n → `best.pt` → `capacete_best.onnx` (Colab, GPU) |
 | `treino/classes_coco80_pt.txt` | as 80 classes COCO em português da Aula 13, para carimbar o `yolo11n.pt` |
-| `web/` | o leitor universal: Vite + React + TypeScript + Tailwind v4, com componentes do Magic UI |
+| `web/` | o leitor universal no navegador (Vite + React + TypeScript) |
 | `web/src/lib/passaporte.js` | leitura e gravação do passaporte direto nos bytes do protobuf |
 | `web/src/lib/decodificadores.js` | pré-processamento, NMS e um decodificador por formato de saída |
 | `web/src/lib/motor.ts` | sessão do ONNX Runtime Web (wasm empacotado, funciona offline) e rascunho de passaporte |
@@ -118,9 +118,11 @@ classe que não existe.
 
 ## ▶️ Como executar
 
+Pré-requisitos: [uv](https://docs.astral.sh/uv/) e Node.js 20 ou mais recente.
+
 ### 💻 Localmente
 
-Na raiz do workspace das entregas:
+Na raiz do workspace das entregas (`Entregas - Matheus Marinho/`):
 
 ```bash
 uv sync --all-packages
@@ -146,6 +148,17 @@ npm run build      # versão estática em web/dist
 
 Sem `--pesos`, `de_ultralytics.py` usa o `runs/detect/*/weights/best.pt` mais recente.
 
+### 🔎 Usando o leitor
+
+1. Com `npm run dev` rodando, abra o endereço mostrado no terminal.
+2. Em **01 / Modelo**, solte ou escolha um `.onnx` (por exemplo `modelos/yolo11n_pt.onnx` ou
+   `modelos/capacete_best.onnx`). O passaporte aparece à esquerda.
+3. Em **02 / Imagem**, solte ou escolha uma foto. O resultado mostra o estado (ALERTA, VERIFICAR, OK
+   ou INCERTO), as caixas e a lista de detecções.
+4. Ajuste a confiança mínima e o IoU no painel **Operação**, se quiser; o resultado atualiza na hora.
+5. Se o `.onnx` não tiver passaporte, complete o rascunho em JSON e clique em **Carimbar e baixar**:
+   o arquivo carimbado é baixado e carregado no leitor.
+
 ### ☁️ Google Colab (treino no Roboflow)
 
 1. Abra `treino/treino_hardhat_colab.ipynb` no Colab com **GPU T4**.
@@ -153,35 +166,6 @@ Sem `--pesos`, `de_ultralytics.py` usa o `runs/detect/*/weights/best.pt` mais re
    código.
 3. **Ambiente de execução → Executar tudo**. No fim, `capacete_best.onnx` é baixado.
 4. Copie o arquivo para `modelos/` e abra no leitor.
-
-## 🎨 Interface
-
-Visual inspirado no [Infisical](https://infisical.com/): fundo branco, texto quase preto, bordas de 1 px,
-cantos retos, botões em pílula, amarelo neon (`#f7fe62`) como único destaque e rótulos em mono
-maiúsculo (JetBrains Mono) com tags entre colchetes, como `[carregado]`. Tema escuro automático pelo
-sistema, com botão para alternar.
-
-Componentes do [Magic UI](https://magicui.design/), instalados pelo CLI do shadcn:
-
-| componente | onde |
-| --- | --- |
-| Grid Pattern | grade do topo, com quadrados neon acesos |
-| Dot Pattern | aparece nas áreas de soltar arquivo ao passar o mouse ou arrastar |
-| Animated Shiny Text | selo `lia.passaporte v1` |
-| Typing Animation | o que o arquivo informa: classes, pré-processamento, regra, métricas |
-| Number Ticker | mAP50, mAP50-95 e época do best; tempo de inferência |
-| Border Beam | moldura da imagem enquanto a inferência roda |
-| Animated List | detecções entrando uma a uma, da maior para a menor confiança |
-| Shimmer Button | "Carimbar e baixar" no fluxo sem passaporte |
-
-Nas faixas laterais, fora da coluna central, roda o fundo ASCII
-[Fluid](https://asciify.org/docs/backgrounds/fluid) do asciify-engine (MIT), com um rastro que segue
-o cursor. A coluna central é sólida e cobre a animação, então nada do conteúdo fica por cima do
-ASCII. Os caracteres usam uma cor só, bem perto do fundo: `#1e1e1e` no tema escuro e `#e9e9e7` no
-claro. O template copiado fica em `web/src/components/ascii/`, sem alterações.
-
-Caixas desenhadas em amarelo neon; vermelho fica reservado para o que de fato dispara o alerta
-(classe de alerta acima de `limiar_alerta`), para que o destaque signifique decisão e não só classe.
 
 ## ✅ Verificação feita
 
