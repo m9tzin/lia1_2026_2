@@ -1,0 +1,9 @@
+{
+  "name": "passaporte-onnx-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "web": "python3 -m http.server 8000"
+  }
+}

@@ -1,0 +1,24 @@
+[project]
+name = "passaporte-onnx"
+version = "1.0.0"
+description = "Passaporte de modelos ONNX e leitor universal no navegador"
+requires-python = ">=3.12"
+dependencies = [
+    "ultralytics>=8.4.0,<9",
+    "onnx>=1.17",
+    "onnxruntime>=1.20",
+    "onnxslim>=0.1.40",
+    "jsonschema>=4.23",
+    "torch>=2.5",
+    "numpy>=2.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

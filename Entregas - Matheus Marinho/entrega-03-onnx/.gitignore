@@ -1,0 +1,4 @@
+runs/
+*.pt
+modelos/yolo11n_pt.onnx
+.pytest_cache/

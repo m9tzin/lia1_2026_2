@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leitor de Passaporte ONNX</title>
+  <style>
+    :root {
+      --fundo: #f6f5f1; --painel: #ffffff; --texto: #1d1d1b; --suave: #6b6a65; --borda: #e2e0d8;
+      --acento: #2f5d8a; --ok: #2e7d4f; --alerta: #b3261e; --verificar: #a86b00;
+      --codigo: #f0efe9;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fundo: #161615; --painel: #1f1f1d; --texto: #ecebe6; --suave: #a09e97; --borda: #34332f;
+        --acento: #7fb0de; --ok: #6cc592; --alerta: #f08a82; --verificar: #e6b450; --codigo: #262623;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--fundo); color: var(--texto);
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+    header h1 { margin: 0; font-size: 1.5rem; }
+    header p { margin: 4px 0 0; color: var(--suave); }
+    .grade { display: grid; grid-template-columns: 360px 1fr; gap: 16px; margin-top: 20px; }
+    @media (max-width: 860px) { .grade { grid-template-columns: 1fr; } }
+    section {
+      background: var(--painel); border: 1px solid var(--borda); border-radius: 10px; padding: 16px;
+    }
+    section + section { margin-top: 16px; }
+    h2 { font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); margin: 0 0 12px; }
+    .soltar {
+      display: block; border: 1.5px dashed var(--borda); border-radius: 8px; padding: 18px;
+      text-align: center; cursor: pointer; color: var(--suave);
+    }
+    .soltar.ativo, .soltar:hover { border-color: var(--acento); color: var(--acento); }
+    .soltar input { display: none; }
+    dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; }
+    dt { color: var(--suave); }
+    dd { margin: 0; overflow-wrap: anywhere; }
+    .classes { display: flex; flex-wrap: wrap; gap: 4px; }
+    .classes span { background: var(--codigo); border-radius: 4px; padding: 0 6px; font-size: .85rem; }
+    .aviso { color: var(--verificar); }
+    .erro { color: var(--alerta); }
+    .oculto { display: none !important; }
+    label.controle { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; margin-top: 10px; }
+    label.controle input { grid-column: 1 / -1; width: 100%; }
+    textarea {
+      width: 100%; min-height: 340px; font: 12.5px/1.45 ui-monospace, Menlo, monospace;
+      background: var(--codigo); color: var(--texto); border: 1px solid var(--borda); border-radius: 6px; padding: 10px;
+    }
+    button {
+      background: var(--acento); color: var(--painel); border: 0; border-radius: 6px;
+      padding: 8px 14px; font: inherit; cursor: pointer; margin-top: 10px;
+    }
+    .selo {
+      display: flex; align-items: baseline; gap: 12px; padding: 12px 14px; border-radius: 8px;
+      border: 1px solid var(--borda); margin-bottom: 12px;
+    }
+    .selo strong { font-size: 1.4rem; letter-spacing: .02em; }
+    .selo.ALERTA { border-color: var(--alerta); color: var(--alerta); }
+    .selo.VERIFICAR, .selo.INCERTO { border-color: var(--verificar); color: var(--verificar); }
+    .selo.OK { border-color: var(--ok); color: var(--ok); }
+    canvas { max-width: 100%; height: auto; border-radius: 6px; display: block; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: .9rem; }
+    th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--borda); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .vazio { color: var(--suave); padding: 40px 0; text-align: center; }
+    code { background: var(--codigo); padding: 0 4px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Leitor de Passaporte ONNX</h1>
+    <p>Qualquer modelo com passaporte roda aqui. O leitor não conhece o framework: segue o contrato
+      gravado em <code>lia.passaporte</code> dentro do próprio <code>.onnx</code>.</p>
+  </header>
+
+  <div class="grade">
+    <div>
+      <section>
+        <h2>1. Modelo</h2>
+        <label class="soltar" id="soltarModelo">
+          <input type="file" id="arquivoModelo" accept=".onnx">
+          <span id="rotuloModelo">Solte um <code>.onnx</code> aqui ou clique</span>
+        </label>
+        <p id="estadoModelo" class="oculto"></p>
+      </section>
+
+      <section id="painelPassaporte" class="oculto">
+        <h2>Passaporte</h2>
+        <dl id="fichaPassaporte"></dl>
+      </section>
+
+      <section id="painelCarimbo" class="oculto">
+        <h2>Sem passaporte</h2>
+        <p>Este modelo não diz como deve ser usado, e o leitor não adivinha. Complete o passaporte
+          abaixo (o rascunho já vem com os tensores do grafo) e carimbe.</p>
+        <textarea id="rascunho" spellcheck="false"></textarea>
+        <ul id="errosRascunho" class="erro"></ul>
+        <button id="botaoCarimbar">Carimbar e baixar</button>
+      </section>
+
+      <section id="painelControles" class="oculto">
+        <h2>Operação</h2>
+        <label class="controle">Confiança mínima <output id="valorConfianca"></output>
+          <input type="range" id="confianca" min="0.05" max="0.95" step="0.05"></label>
+        <label class="controle" id="controleIou">IoU do NMS <output id="valorIou"></output>
+          <input type="range" id="iou" min="0.1" max="0.9" step="0.05"></label>
+      </section>
+    </div>
+
+    <div>
+      <section>
+        <h2>2. Imagem</h2>
+        <label class="soltar" id="soltarImagem">
+          <input type="file" id="arquivoImagem" accept="image/*">
+          <span>Solte uma imagem aqui ou clique</span>
+        </label>
+      </section>
+      <section>
+        <h2>Resultado</h2>
+        <div id="selo" class="selo oculto"><strong id="seloEstado"></strong><span id="seloMotivo"></span></div>
+        <canvas id="tela" class="oculto"></canvas>
+        <div id="vazio" class="vazio">Carregue um modelo e uma imagem.</div>
+        <table id="tabela" class="oculto">
+          <thead><tr><th>Classe</th><th class="num">Confiança</th><th id="colCaixa">Caixa (x1, y1, x2, y2)</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p id="tempo" class="oculto" style="color: var(--suave)"></p>
+      </section>
+    </div>
+  </div>
+</main>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

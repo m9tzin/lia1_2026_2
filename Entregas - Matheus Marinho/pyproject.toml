@@ -10,6 +10,7 @@ members = [
     "exercicios-praticos/*",
     "entrega-01-yolo/exercicios-03-yolo",
     "entrega-02-tensorflow",
+    "entrega-03-onnx",
 ]
 
 [dependency-groups]
