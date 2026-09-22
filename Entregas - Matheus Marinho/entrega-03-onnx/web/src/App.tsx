@@ -248,9 +248,8 @@ export default function App() {
           </section>
         </main>
 
-        <footer className="flex flex-wrap items-center justify-between gap-2 border-t px-6 py-5 sm:px-10">
-          <span className="rotulo">Matheus Sousa Marinho · entrega 03</span>
-          <span className="tag text-muted-foreground">onnx runtime web · inferência local, nada sai do navegador</span>
+        <footer className="border-t px-6 py-5 sm:px-10">
+          <span className="rotulo">© 2026 Matheus Marinho</span>
         </footer>
       </div>
     </div>
