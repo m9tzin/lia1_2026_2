@@ -8,8 +8,8 @@ o ``best.pt`` (época de maior fitness). O best.pt guarda em ``train_metrics`` a
 Uso:
     python -m passaporte.de_ultralytics                          # best.pt mais recente em runs/
     python -m passaporte.de_ultralytics --pesos caminho/best.pt --classes classes_pt.txt \
-        --nome "Capacete em obra" --dataset hard-hat-workers \
-        --alertar-se "sem capacete" --limiar-alerta 0.5 --zona-incerta 0.3 0.5
+        --nome "Buraco na via" --dataset pothole-detection-yolo-v8 \
+        --alertar-se buraco --limiar-alerta 0.5 --zona-incerta 0.3 0.5
 """
 
 from __future__ import annotations
