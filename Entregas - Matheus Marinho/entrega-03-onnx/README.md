@@ -165,7 +165,7 @@ Componentes do [Magic UI](https://magicui.design/), instalados pelo CLI do shadc
 
 | componente | onde |
 | --- | --- |
-| Grid Pattern | fundo do topo, com quadrados neon acesos |
+| Grid Pattern | grade do topo, com quadrados neon acesos |
 | Dot Pattern | aparece nas áreas de soltar arquivo ao passar o mouse ou arrastar |
 | Animated Shiny Text | selo `lia.passaporte v1` |
 | Typing Animation | o que o arquivo informa: classes, pré-processamento, regra, métricas |
@@ -173,6 +173,12 @@ Componentes do [Magic UI](https://magicui.design/), instalados pelo CLI do shadc
 | Border Beam | moldura da imagem enquanto a inferência roda |
 | Animated List | detecções entrando uma a uma, da maior para a menor confiança |
 | Shimmer Button | "Carimbar e baixar" no fluxo sem passaporte |
+
+Nas faixas laterais, fora da coluna central, roda o fundo ASCII
+[Fluid](https://asciify.org/docs/backgrounds/fluid) do asciify-engine (MIT), com um rastro que segue
+o cursor. A coluna central é sólida e cobre a animação, então nada do conteúdo fica por cima do
+ASCII. Os caracteres usam uma cor só, bem perto do fundo: `#1e1e1e` no tema escuro e `#e9e9e7` no
+claro. O template copiado fica em `web/src/components/ascii/`, sem alterações.
 
 Caixas desenhadas em amarelo neon; vermelho fica reservado para o que de fato dispara o alerta
 (classe de alerta acima de `limiar_alerta`), para que o destaque signifique decisão e não só classe.

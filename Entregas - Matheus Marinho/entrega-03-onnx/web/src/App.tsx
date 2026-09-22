@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 
 import { Carimbo } from "@/components/Carimbo"
 import { Ficha } from "@/components/Ficha"
+import { FundoAscii } from "@/components/FundoAscii"
 import { Hero } from "@/components/Hero"
 import { Resultado } from "@/components/Resultado"
 import { Soltar } from "@/components/Soltar"
@@ -147,8 +148,11 @@ export default function App() {
   const mb = bytes ? `${(bytes.length / 1e6).toFixed(1)} MB` : undefined
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[1240px] border-x">
+    <>
+    <FundoAscii />
+    {/* As laterais deixam o cursor passar até o fundo ASCII; a coluna central é sólida. */}
+    <div className="pointer-events-none relative z-10 min-h-screen">
+      <div className="pointer-events-auto mx-auto min-h-screen max-w-[1240px] border-x bg-background">
         <header className="flex items-center justify-between border-b px-6 py-4 sm:px-10">
           <div className="flex items-center gap-2.5">
             <span className="grid size-6 place-items-center bg-neon font-mono text-[11px] font-bold text-black">P</span>
@@ -249,9 +253,20 @@ export default function App() {
         </main>
 
         <footer className="border-t px-6 py-5 sm:px-10">
-          <span className="rotulo">© 2026 Matheus Marinho</span>
+          <span className="rotulo">
+            © 2026{" "}
+            <a
+              href="https://github.com/m9tzin"
+              target="_blank"
+              rel="noreferrer"
+              className="text-foreground underline decoration-neon decoration-2 underline-offset-4 transition-colors hover:bg-neon hover:text-black"
+            >
+              Matheus Marinho
+            </a>
+          </span>
         </footer>
       </div>
     </div>
+    </>
   )
 }

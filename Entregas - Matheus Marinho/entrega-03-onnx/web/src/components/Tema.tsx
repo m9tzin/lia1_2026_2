@@ -13,6 +13,18 @@ function inicial(): Tema {
   return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
 }
 
+// Tema efetivo da página, lido de <html data-theme>. Atualiza quando o botão troca o tema.
+export function useTemaAtual(): Tema {
+  const ler = (): Tema => (document.documentElement.dataset.theme === "dark" ? "dark" : "light")
+  const [tema, setTema] = useState<Tema>(() => document.documentElement.dataset.theme ? ler() : inicial())
+  useEffect(() => {
+    const obs = new MutationObserver(() => setTema(ler()))
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] })
+    return () => obs.disconnect()
+  }, [])
+  return tema
+}
+
 // Alterna claro/escuro; começa pelo tema do sistema e lembra a escolha neste navegador.
 export function BotaoTema() {
   const [tema, setTema] = useState<Tema>(inicial)
