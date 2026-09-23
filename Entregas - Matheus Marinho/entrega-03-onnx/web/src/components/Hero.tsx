@@ -1,23 +1,27 @@
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text"
+import { FundoAscii } from "@/components/FundoAscii"
 import { CircledText } from "@/components/ui/circled-text"
-import { GridPattern } from "@/components/ui/grid-pattern"
 import { TypingAnimation } from "@/components/ui/typing-animation"
 
-// Quadrados acesos na grade, como os blocos neon do Infisical.
-const QUADRADOS: [number, number][] = [
-  [9, 0], [10, 0], [16, 0], [24, 1], [25, 1], [25, 2], [22, 3], [27, 4], [23, 6], [26, 7],
-]
+// O mesmo fundo ASCII das laterais, aqui no amarelo neon dos antigos blocos da grade. No tema claro
+// o neon some no branco, então os caracteres usam um oliva mais escuro.
+const NEON = { dark: "#f7fe62", light: "#9fa300" }
+
+// Só a metade direita recebe o ASCII, para não competir com o título. A máscara horizontal some
+// da direita para o meio e a vertical esmaece em direção ao rodapé do hero; as duas se intersectam.
+const MASCARA = {
+  maskImage: "linear-gradient(to left, black 25%, transparent 60%), linear-gradient(to bottom, black 40%, transparent)",
+  maskComposite: "intersect",
+} as const
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b">
-      <GridPattern
-        width={44}
-        height={44}
-        squares={QUADRADOS}
-        className="fill-neon stroke-(--grade) mask-[linear-gradient(to_bottom,black_40%,transparent)]"
-      />
-      <div className="relative px-6 pt-20 pb-14 sm:px-10 sm:pt-24 sm:pb-20">
+      <div className="absolute inset-0" style={MASCARA}>
+        <FundoAscii cores={NEON} className="absolute inset-0" />
+      </div>
+      {/* O bloco deixa o cursor passar até o ASCII; o texto em si continua selecionável. */}
+      <div className="pointer-events-none relative *:pointer-events-auto px-6 pt-20 pb-14 sm:px-10 sm:pt-24 sm:pb-20">
         <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1">
           <span className="size-1.5 rounded-full bg-ok" />
           <AnimatedShinyText className="tag mx-0 max-w-none">YOLONNX v1</AnimatedShinyText>
