@@ -80,17 +80,23 @@ export default function App() {
   const [credito, setCredito] = useState<Credito | null>(null)
   // O que o usuário soltou vence o exemplo, mesmo que o exemplo termine de baixar depois.
   const doUsuario = useRef({ modelo: false, imagem: false })
+  // Muda a cada limpeza, para uma sessão que termine de criar depois do clique não voltar à tela.
+  const limpezas = useRef(0)
 
   const ativar = useCallback(async (b: Uint8Array, p: Passaporte) => {
+    const geracao = limpezas.current
     setPassaporte(p)
     setPendencia(null)
     setConfianca(p.operacao.confianca_minima)
     setIou(p.operacao.iou_nms ?? 0.45)
     setAviso({ texto: "Criando sessão do ONNX Runtime…", tipo: "info" })
     try {
-      setSessao(await criarSessao(b))
+      const s = await criarSessao(b)
+      if (geracao !== limpezas.current) return void s.release()
+      setSessao(s)
       setAviso(null)
     } catch (e) {
+      if (geracao !== limpezas.current) return
       setAviso({ texto: `ONNX Runtime recusou o modelo: ${(e as Error).message}`, tipo: "erro" })
     }
   }, [])
@@ -139,6 +145,26 @@ export default function App() {
     await img.decode()
     setNomeImagem(arquivo.name)
     setImagem(img)
+  }
+
+  // Tira o modelo e a imagem da tela (os do exemplo ou os do usuário) e deixa as duas áreas vazias.
+  function limpar() {
+    limpezas.current++
+    doUsuario.current = { modelo: true, imagem: true }
+    sessao?.release()
+    if (imagem?.src.startsWith("blob:")) URL.revokeObjectURL(imagem.src)
+    setBytes(null)
+    setNomeModelo(undefined)
+    setInfo(null)
+    setPassaporte(null)
+    setPendencia(null)
+    setSessao(null)
+    setImagem(null)
+    setNomeImagem(undefined)
+    setExecucao(null)
+    setRodando(false)
+    setCredito(null)
+    setAviso(null)
   }
 
   useEffect(() => {
@@ -238,6 +264,21 @@ export default function App() {
             }}
           />
         </div>
+
+        {(nomeModelo || nomeImagem) && (
+          <div className="flex items-center justify-between gap-4 border-b px-6 py-3 sm:px-10">
+            <span className="truncate font-mono text-xs text-muted-foreground">
+              {[nomeModelo, nomeImagem].filter(Boolean).join(" + ")}
+            </span>
+            <button
+              type="button"
+              onClick={limpar}
+              className="shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors hover:bg-foreground hover:text-background"
+            >
+              Limpar modelo e imagem
+            </button>
+          </div>
+        )}
 
         {aviso && (
           <div className={cn("border-b px-6 py-3 font-mono text-xs sm:px-10", aviso.tipo === "erro" ? "text-alerta" : "text-muted-foreground")}>

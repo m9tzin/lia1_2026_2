@@ -55,6 +55,8 @@ export function Soltar({ numero, titulo, aceita, arquivo, detalhe, aoReceber, id
         onChange={() => {
           const f = input.current?.files?.[0]
           if (f) aoReceber(f)
+          // Zera o campo para o mesmo arquivo poder ser escolhido de novo depois de limpar.
+          if (input.current) input.current.value = ""
         }}
       />
       <div className="relative flex items-center justify-between">
